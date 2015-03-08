@@ -5,6 +5,10 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwinHelloWorld", "OwinHelloWorld\OwinHelloWorld.csproj", "{36368BB0-C6AC-4115-9318-4C0964A86C34}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwinConsoleHelloWorld", "OwinConsoleHelloWorld\OwinConsoleHelloWorld.csproj", "{74DE90EB-D5FB-49EB-AABC-5C7D7D05B7C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OwinHelloWorld2", "OwinHelloWorld2\OwinHelloWorld2.csproj", "{BCA80866-AFA4-4CC1-9315-BACCCFE8E0AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{36368BB0-C6AC-4115-9318-4C0964A86C34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36368BB0-C6AC-4115-9318-4C0964A86C34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36368BB0-C6AC-4115-9318-4C0964A86C34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74DE90EB-D5FB-49EB-AABC-5C7D7D05B7C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74DE90EB-D5FB-49EB-AABC-5C7D7D05B7C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74DE90EB-D5FB-49EB-AABC-5C7D7D05B7C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74DE90EB-D5FB-49EB-AABC-5C7D7D05B7C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCA80866-AFA4-4CC1-9315-BACCCFE8E0AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCA80866-AFA4-4CC1-9315-BACCCFE8E0AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCA80866-AFA4-4CC1-9315-BACCCFE8E0AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCA80866-AFA4-4CC1-9315-BACCCFE8E0AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
