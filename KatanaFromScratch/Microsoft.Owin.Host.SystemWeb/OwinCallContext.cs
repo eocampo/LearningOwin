@@ -46,67 +46,88 @@ namespace Microsoft.Owin.Host.SystemWeb
         private object _startLock = new object();
         private bool _headersSent;
 
-        public OwinCallContext(OwinAppContext appContext,
+        internal OwinCallContext(
+            OwinAppContext appContext,
             RequestContext requestContext,
             string requestPathBase,
             string requestPath,
             AsyncCallback cb,
-            object extraData) 
-        {            
+            object extraData)
+        {
             _appContext = appContext;
             _requestContext = requestContext;
             _requestPathBase = requestPathBase;
             _requestPath = requestPath;
 
             AsyncResult = new CallContextAsyncResult(this, cb, extraData);
-            
+
+            _httpContext = _requestContext.HttpContext;
+            _httpRequest = _httpContext.Request;
+            _httpResponse = _httpContext.Response;
+
+            _disconnectWatcher = new DisconnectWatcher(_httpResponse);
+            RegisterForOnSendingHeaders();
         }
 
-        internal AspNetDictionary Environment {
+        internal AspNetDictionary Environment
+        {
             get { return _env; }
         }
 
         internal CallContextAsyncResult AsyncResult { get; private set; }
 
-        internal void Execute() {
+        internal void Execute()
+        {
             CreateEnvironment();
 
             _completedSynchronouslyThreadId = Thread.CurrentThread.ManagedThreadId;
-            try {
+            try
+            {
                 _appContext.AppFunc(_env)
                     // We can't use Then/Catch here because they would re-enter the sync context.
                     // The async callback must be called outside of the sync context.
-                           .ContinueWith(appTask => {
-                               if (appTask.IsFaulted) {
-                                   if (!TryRelayExceptionToIntegratedPipeline(false, appTask.Exception)) {
+                           .ContinueWith(appTask =>
+                           {
+                               if (appTask.IsFaulted)
+                               {
+                                   if (!TryRelayExceptionToIntegratedPipeline(false, appTask.Exception))
+                                   {
                                        Complete(ErrorState.Capture(appTask.Exception));
                                    }
                                }
-                               else if (appTask.IsCanceled) {
+                               else if (appTask.IsCanceled)
+                               {
                                    Exception ex = new TaskCanceledException(appTask);
-                                   if (!TryRelayExceptionToIntegratedPipeline(false, ex)) {
+                                   if (!TryRelayExceptionToIntegratedPipeline(false, ex))
+                                   {
                                        Complete(ErrorState.Capture(ex));
                                    }
                                }
-                               else {
+                               else
+                               {
                                    OnEnd();
                                }
                            });
             }
-            catch (Exception) {
+            catch (Exception)
+            {
                 throw;
             }
-            finally {
+            finally
+            {
                 _completedSynchronouslyThreadId = Int32.MinValue;
             }
         }
 
-        internal bool TryRelayExceptionToIntegratedPipeline(bool sync, Exception ex) {
+        internal bool TryRelayExceptionToIntegratedPipeline(bool sync, Exception ex)
+        {
             // Flow errors back through the integrated pipeline owin middleware.
             object obj;
-            if (Environment.TryGetValue(Constants.IntegratedPipelineContext, out obj)) {
+            if (Environment.TryGetValue(Constants.IntegratedPipelineContext, out obj))
+            {
                 var integratedContext = obj as IntegratedPipelineContext;
-                if (integratedContext != null) {
+                if (integratedContext != null)
+                {
                     TaskCompletionSource<object> tcs = integratedContext.TakeLastCompletionSource();
                     tcs.TrySetException(ex);
                     AsyncResult.Complete(sync, null);
@@ -116,141 +137,178 @@ namespace Microsoft.Owin.Host.SystemWeb
             return false;
         }
 
-        private X509Certificate LoadClientCert() {
-            if (_httpContext.Request.IsSecureConnection) {
-                try {
+        private X509Certificate LoadClientCert()
+        {
+            if (_httpContext.Request.IsSecureConnection)
+            {
+                try
+                {
                     if (_httpContext.Request.ClientCertificate != null
-                        && _httpContext.Request.ClientCertificate.IsPresent) {
+                        && _httpContext.Request.ClientCertificate.IsPresent)
+                    {
                         return new X509Certificate2(_httpContext.Request.ClientCertificate.Certificate);
                     }
                 }
-                catch (CryptographicException ce) {
-                    Trace.WriteError("An exception was thrown while trying to load the client certificate:", ce);
+                catch (CryptographicException ce)
+                {
+                    Trace.WriteError(Resources.Trace_ClientCertException, ce);
                 }
             }
             return null;
         }
 
-        private Task LoadClientCertAsync() {
-            try {
+        private Task LoadClientCertAsync()
+        {
+            try
+            {
                 if (_httpContext.Request.ClientCertificate != null
-                    && _httpContext.Request.ClientCertificate.IsPresent) {
+                    && _httpContext.Request.ClientCertificate.IsPresent)
+                {
                     _env.ClientCert = new X509Certificate2(_httpContext.Request.ClientCertificate.Certificate);
                 }
             }
-            catch (CryptographicException ce) {
-                Trace.WriteError("An exception was thrown while trying to load the client certificate:", ce);
+            catch (CryptographicException ce)
+            {
+                Trace.WriteError(Resources.Trace_ClientCertException, ce);
             }
             return Utils.CompletedTask;
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception is thrown async")]
-        private Task SendFileAsync(string name, long offset, long? count, CancellationToken cancel) {
-            if (cancel.IsCancellationRequested) {
+        private Task SendFileAsync(string name, long offset, long? count, CancellationToken cancel)
+        {
+            if (cancel.IsCancellationRequested)
+            {
                 return Utils.CancelledTask;
             }
 
-            try {
+            try
+            {
                 OnStart();
                 // TransmitFile is not safe to call on a background thread.  It should complete quickly so long as buffering is enabled.
                 _httpContext.Response.TransmitFile(name, offset, count ?? -1);
 
                 return Utils.CompletedTask;
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return Utils.CreateFaultedTask(ex);
             }
         }
 
         // .NET 4.6+ (introduced in 4.5.2 but didn't work until 4.6, use 'PushPromise' to detect 4.6). This informs us when a non-OWIN component flushes the response headers.
-        private void RegisterForOnSendingHeaders() {
-            if (OnSendingHeadersRegister != null && PushPromiseMethod != null) {
-                try {
+        private void RegisterForOnSendingHeaders()
+        {
+            if (OnSendingHeadersRegister != null && PushPromiseMethod != null)
+            {
+                try
+                {
                     OnSendingHeadersRegister.Invoke(_httpResponse, new object[] { (Action<HttpContextBase>)(_ => { OnStart(); }) });
                 }
-                catch (TargetInvocationException) {
+                catch (TargetInvocationException)
+                {
                     // InnerException: NotImplementedException
                 }
             }
         }
 
-        public void OnStart() {
+        public void OnStart()
+        {
             Exception exception = LazyInitializer.EnsureInitialized(
                 ref _startException,
                 ref _startCalled,
                 ref _startLock,
                 StartOnce);
 
-            if (exception != null) {
+            if (exception != null)
+            {
                 throw new InvalidOperationException(string.Empty, exception);
             }
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Re-thrown outside EnsureInitialized")]
-        private Exception StartOnce() {
-            try {
+        private Exception StartOnce()
+        {
+            try
+            {
                 _sendingHeadersEvent.Fire();
 
                 _headersSent = true;
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return ex;
             }
             return null;
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Passed to callback")]
-        public void OnEnd() {
-            try {
+        public void OnEnd()
+        {
+            try
+            {
                 OnStart();
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 Complete(ErrorState.Capture(ex));
                 return;
             }
             Complete();
         }
 
-        private void Complete() {
+        private void Complete()
+        {
             AsyncResult.Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, null);
         }
 
-        private void Complete(ErrorState errorState) {
+        private void Complete(ErrorState errorState)
+        {
             Complete(_completedSynchronouslyThreadId == Thread.CurrentThread.ManagedThreadId, errorState);
         }
 
-        internal void Complete(bool sync, ErrorState errorState) {
+        internal void Complete(bool sync, ErrorState errorState)
+        {
             AbortIfHeaderSent();
             AsyncResult.Complete(sync, errorState);
         }
 
         // Prevent IIS from injecting HTML error details into response bodies that are already in progress.
-        internal void AbortIfHeaderSent() {
+        internal void AbortIfHeaderSent()
+        {
             // 4.6+, this is more reliable as it includes non-OWIN modules.
-            if (CheckHeadersWritten != null) {
-                try {
+            if (CheckHeadersWritten != null)
+            {
+                try
+                {
                     bool written = (bool)CheckHeadersWritten.Invoke(_httpResponse, null);
-                    if (written) {
+                    if (written)
+                    {
                         _httpRequest.Abort();
                     }
                     return;
                 }
-                catch (TargetInvocationException) {
+                catch (TargetInvocationException)
+                {
                     // InnerException: NotImplementedException
                 }
             }
 
-            if (_headersSent) {
+            if (_headersSent)
+            {
                 _httpRequest.Abort();
             }
         }
 
-        public void Dispose() {
+        public void Dispose()
+        {
             Dispose(true);
         }
 
-        protected virtual void Dispose(bool disposing) {
-            if (disposing) {
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
                 _disconnectWatcher.Dispose();
             }
         }

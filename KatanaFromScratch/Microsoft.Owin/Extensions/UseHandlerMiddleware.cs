@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-// https://katanaproject.codeplex.com/SourceControl/latest#src/Microsoft.Owin/Extensions/UseHandlerMiddleware.cs
-
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -23,8 +21,10 @@ namespace Microsoft.Owin.Extensions
         /// </summary>
         /// <param name="next">The pointer to next middleware.</param>
         /// <param name="handler">A function that handles all requests.</param>
-        public UseHandlerMiddleware(AppFunc next, Func<IOwinContext, Task> handler) {
-            if (handler == null) {
+        public UseHandlerMiddleware(AppFunc next, Func<IOwinContext, Task> handler)
+        {
+            if (handler == null)
+            {
                 throw new ArgumentNullException("handler");
             }
             _next = next;
@@ -36,8 +36,10 @@ namespace Microsoft.Owin.Extensions
         /// </summary>
         /// <param name="next">The pointer to next middleware.</param>
         /// <param name="handler">A function that handles the request or calls the given next function.</param>
-        public UseHandlerMiddleware(AppFunc next, Func<IOwinContext, Func<Task>, Task> handler) {
-            if (handler == null) {
+        public UseHandlerMiddleware(AppFunc next, Func<IOwinContext, Func<Task>, Task> handler)
+        {
+            if (handler == null)
+            {
                 throw new ArgumentNullException("handler");
             }
             _next = next;
@@ -49,7 +51,8 @@ namespace Microsoft.Owin.Extensions
         /// </summary>
         /// <param name="environment">The OWIN context.</param>
         /// <returns>The <see cref="T:System.Threading.Tasks.Task" /> object that represents the request operation.</returns>
-        public Task Invoke(IDictionary<string, object> environment) {
+        public Task Invoke(IDictionary<string, object> environment)
+        {
             IOwinContext context = new OwinContext(environment);
             return _handler.Invoke(context);
         }

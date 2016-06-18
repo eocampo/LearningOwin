@@ -83,7 +83,7 @@ namespace Microsoft.Owin.Host.SystemWeb
             }
             catch (AggregateException ag)
             {
-                Trace.WriteError("The application threw one or more exceptions when notified of a client disconnect:", ag);
+                Trace.WriteError(Resources.Trace_RequestDisconnectCallbackExceptions, ag);
             }
         }
 

@@ -18,28 +18,32 @@ namespace Microsoft.Owin.Host.SystemWeb
         private static bool _blueprintInitialized;
         private static object _blueprintLock = new object();
 
-        public void Init(HttpApplication context) {
+        public void Init(HttpApplication context)
+        {
             IntegratedPipelineBlueprint blueprint = LazyInitializer.EnsureInitialized(
                 ref _blueprint,
                 ref _blueprintInitialized,
                 ref _blueprintLock,
                 InitializeBlueprint);
 
-            if (blueprint != null) {
+            if (blueprint != null)
+            {
                 var integratedPipelineContext = new IntegratedPipelineContext(blueprint);
                 integratedPipelineContext.Initialize(context);
             }
         }
 
-        public void Dispose() {
-            
+        public void Dispose()
+        {
         }
 
-        private IntegratedPipelineBlueprint InitializeBlueprint() {
+        private IntegratedPipelineBlueprint InitializeBlueprint()
+        {
             IntegratedPipelineBlueprintStage firstStage = null;
 
             Action<IAppBuilder> startup = OwinBuilder.GetAppStartup();
-            OwinAppContext appContext = OwinBuilder.Build(builder => {
+            OwinAppContext appContext = OwinBuilder.Build(builder =>
+            {
                 EnableIntegratedPipeline(builder, stage => firstStage = stage);
                 startup.Invoke(builder);
             });
@@ -49,23 +53,29 @@ namespace Microsoft.Owin.Host.SystemWeb
             return new IntegratedPipelineBlueprint(appContext, firstStage, basePath);
         }
 
-        private static void EnableIntegratedPipeline(IAppBuilder app, Action<IntegratedPipelineBlueprintStage> onStageCreated) {
+        private static void EnableIntegratedPipeline(IAppBuilder app, Action<IntegratedPipelineBlueprintStage> onStageCreated)
+        {
             var stage = new IntegratedPipelineBlueprintStage { Name = "PreHandlerExecute" };
             onStageCreated(stage);
-            Action<IAppBuilder, string> stageMarker = (builder, name) => {
-                Func<AppFunc, AppFunc> decoupler = next => {
-                    if (string.Equals(name, stage.Name, StringComparison.OrdinalIgnoreCase)) {
+            Action<IAppBuilder, string> stageMarker = (builder, name) =>
+            {
+                Func<AppFunc, AppFunc> decoupler = next =>
+                {
+                    if (string.Equals(name, stage.Name, StringComparison.OrdinalIgnoreCase))
+                    {
                         // no decoupling needed when pipeline is already split at this name
                         return next;
                     }
-                    if (!IntegratedPipelineContext.VerifyStageOrder(name, stage.Name)) {
+                    if (!IntegratedPipelineContext.VerifyStageOrder(name, stage.Name))
+                    {
                         // Stage markers added out of order will be ignored.
                         // Out of order stages/middleware may be run earlier than expected.
                         // TODO: LOG
                         return next;
                     }
                     stage.EntryPoint = next;
-                    stage = new IntegratedPipelineBlueprintStage {
+                    stage = new IntegratedPipelineBlueprintStage
+                    {
                         Name = name,
                         NextStage = stage,
                     };

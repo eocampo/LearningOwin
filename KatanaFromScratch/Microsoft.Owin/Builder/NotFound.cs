@@ -13,13 +13,15 @@ namespace Microsoft.Owin.Builder
     {
         private static readonly Task Completed = CreateCompletedTask();
 
-        private static Task CreateCompletedTask() {
+        private static Task CreateCompletedTask()
+        {
             var tcs = new TaskCompletionSource<object>();
             tcs.SetResult(null);
             return tcs.Task;
         }
 
-        public Task Invoke(IDictionary<string, object> env) {
+        public Task Invoke(IDictionary<string, object> env)
+        {
             env["owin.ResponseStatusCode"] = 404;
             return Completed;
         }

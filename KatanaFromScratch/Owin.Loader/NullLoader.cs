@@ -15,7 +15,8 @@ namespace Owin.Loader
         /// <summary>
         /// A singleton instance of the NullLoader type.
         /// </summary>
-        public static Func<string, IList<string>, Action<IAppBuilder>> Instance {
+        public static Func<string, IList<string>, Action<IAppBuilder>> Instance
+        {
             get { return Singleton.Load; }
         }
 
@@ -25,7 +26,8 @@ namespace Owin.Loader
         /// <param name="startup"></param>
         /// <param name="errors"></param>
         /// <returns>null.</returns>
-        public Action<IAppBuilder> Load(string startup, IList<string> errors) {
+        public Action<IAppBuilder> Load(string startup, IList<string> errors)
+        {
             return null;
         }
     }

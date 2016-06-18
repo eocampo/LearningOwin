@@ -97,7 +97,7 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
             if (ContainsKey(key))
             {
                 // IDictionary contract
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "The key '{0}' is already present in the dictionary.", key));
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Exception_DuplicateKey, key));
             }
             Add(key, value, 0);
         }

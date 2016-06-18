@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
+// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -33,19 +33,24 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
 
         private State _state;
 
-        public IntegratedPipelineContext(IntegratedPipelineBlueprint blueprint) {
+        public IntegratedPipelineContext(IntegratedPipelineBlueprint blueprint)
+        {
             _blueprint = blueprint;
         }
 
-        public bool PreventNextStage {
+        public bool PreventNextStage
+        {
             get { return _state.PreventNextStage; }
             set { _state.PreventNextStage = value; }
         }
 
-        public void Initialize(HttpApplication application) {
-            for (IntegratedPipelineBlueprintStage stage = _blueprint.FirstStage; stage != null; stage = stage.NextStage) {
+        public void Initialize(HttpApplication application)
+        {
+            for (IntegratedPipelineBlueprintStage stage = _blueprint.FirstStage; stage != null; stage = stage.NextStage)
+            {
                 var segment = new IntegratedPipelineContextStage(this, stage);
-                switch (stage.Name) {
+                switch (stage.Name)
+                {
                     case Constants.StageAuthenticate:
                         application.AddOnAuthenticateRequestAsync(segment.BeginEvent, segment.EndEvent);
                         break;
@@ -81,74 +86,88 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
                         break;
                     default:
                         throw new NotSupportedException(
-                            string.Format(CultureInfo.InvariantCulture, "The given stage '{0}' is not supported.", stage.Name));
+                            string.Format(CultureInfo.InvariantCulture, Resources.Exception_UnsupportedPipelineStage, stage.Name));
                 }
             }
             // application.PreSendRequestHeaders += PreSendRequestHeaders; // Null refs for async un-buffered requests with bodies.
             application.AddOnEndRequestAsync(BeginFinalWork, EndFinalWork);
         }
 
-        private void Reset() {
+        private void Reset()
+        {
             PushExecutingStage(null);
             _state = new State();
         }
 
-        public static Task DefaultAppInvoked(IDictionary<string, object> env) {
+        public static Task DefaultAppInvoked(IDictionary<string, object> env)
+        {
             object value;
-            if (env.TryGetValue(Constants.IntegratedPipelineContext, out value)) {
+            if (env.TryGetValue(Constants.IntegratedPipelineContext, out value))
+            {
                 var self = (IntegratedPipelineContext)value;
                 return self._state.ExecutingStage.DefaultAppInvoked(env);
             }
             throw new InvalidOperationException();
         }
 
-        public static Task ExitPointInvoked(IDictionary<string, object> env) {
+        public static Task ExitPointInvoked(IDictionary<string, object> env)
+        {
             object value;
-            if (env.TryGetValue(Constants.IntegratedPipelineContext, out value)) {
+            if (env.TryGetValue(Constants.IntegratedPipelineContext, out value))
+            {
                 var self = (IntegratedPipelineContext)value;
                 return self._state.ExecutingStage.ExitPointInvoked(env);
             }
             throw new InvalidOperationException();
         }
 
-        private IAsyncResult BeginFinalWork(object sender, EventArgs e, AsyncCallback cb, object extradata) {
+        private IAsyncResult BeginFinalWork(object sender, EventArgs e, AsyncCallback cb, object extradata)
+        {
             var result = new StageAsyncResult(cb, extradata, () => { });
             TaskCompletionSource<object> tcs = TakeLastCompletionSource();
-            if (tcs != null) {
+            if (tcs != null)
+            {
                 tcs.TrySetResult(null);
             }
-            if (_state.OriginalTask != null) {
+            if (_state.OriginalTask != null)
+            {
                 // System.Web does not allow us to use async void methods to complete the IAsyncResult due to the special sync context.
-#pragma warning disable 4014
+                #pragma warning disable 4014
                 DoFinalWork(result);
-#pragma warning restore 4014
+                #pragma warning restore 4014
             }
-            else {
+            else
+            {
                 result.TryComplete();
             }
             result.InitialThreadReturning();
             return result;
         }
 
-        private async Task DoFinalWork(StageAsyncResult result) {
-            try {
+        private async Task DoFinalWork(StageAsyncResult result)
+        {
+            try
+            {
                 await _state.OriginalTask;
                 _state.CallContext.OnEnd();
                 CallContextAsyncResult.End(_state.CallContext.AsyncResult);
                 result.TryComplete();
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 _state.CallContext.AbortIfHeaderSent();
                 result.Fail(ErrorState.Capture(ex));
             }
         }
 
-        private void EndFinalWork(IAsyncResult ar) {
+        private void EndFinalWork(IAsyncResult ar)
+        {
             Reset();
             StageAsyncResult.End(ar);
         }
 
-        public Func<IDictionary<string, object>, Task> PrepareInitialContext(HttpApplication application) {
+        public Func<IDictionary<string, object>, Task> PrepareInitialContext(HttpApplication application)
+        {
             IDictionary<string, object> environment = GetInitialEnvironment(application);
             var originalCompletionSource = new TaskCompletionSource<object>();
             _state.OriginalTask = originalCompletionSource.Task;
@@ -156,8 +175,10 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
             return _blueprint.AppContext.AppFunc;
         }
 
-        public IDictionary<string, object> GetInitialEnvironment(HttpApplication application) {
-            if (_state.CallContext != null) {
+        public IDictionary<string, object> GetInitialEnvironment(HttpApplication application)
+        {
+            if (_state.CallContext != null)
+            {
                 return _state.CallContext.Environment;
             }
 
@@ -178,38 +199,46 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
             return environment;
         }
 
-        public void PushExecutingStage(IntegratedPipelineContextStage stage) {
+        public void PushExecutingStage(IntegratedPipelineContextStage stage)
+        {
             IntegratedPipelineContextStage prior = Interlocked.Exchange(ref _state.ExecutingStage, stage);
-            if (prior != null) {
+            if (prior != null)
+            {
                 prior.Reset();
             }
         }
 
-        public void PushLastObjects(IDictionary<string, object> environment, TaskCompletionSource<object> completionSource) {
+        public void PushLastObjects(IDictionary<string, object> environment, TaskCompletionSource<object> completionSource)
+        {
             IDictionary<string, object> priorEnvironment = Interlocked.CompareExchange(ref _state.LastEnvironment, environment, null);
             TaskCompletionSource<object> priorCompletionSource = Interlocked.CompareExchange(ref _state.LastCompletionSource, completionSource, null);
 
-            if (priorEnvironment != null || priorCompletionSource != null) {
+            if (priorEnvironment != null || priorCompletionSource != null)
+            {
                 // TODO: trace fatal condition
                 throw new InvalidOperationException();
             }
         }
 
-        public IDictionary<string, object> TakeLastEnvironment() {
+        public IDictionary<string, object> TakeLastEnvironment()
+        {
             return Interlocked.Exchange(ref _state.LastEnvironment, null);
         }
 
-        public TaskCompletionSource<object> TakeLastCompletionSource() {
+        public TaskCompletionSource<object> TakeLastCompletionSource()
+        {
             return Interlocked.Exchange(ref _state.LastCompletionSource, null);
         }
 
         // Does stage1 come before stage2?
         // Returns false for unknown stages, or equal stages.
-        internal static bool VerifyStageOrder(string stage1, string stage2) {
+        internal static bool VerifyStageOrder(string stage1, string stage2)
+        {
             int stage1Index = StageNames.IndexOf(stage1);
             int stage2Index = StageNames.IndexOf(stage2);
 
-            if (stage1Index == -1 || stage2Index == -1) {
+            if (stage1Index == -1 || stage2Index == -1)
+            {
                 return false;
             }
             return stage1Index < stage2Index;

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
+// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Threading;
@@ -14,14 +14,16 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
         private int _completions;
         private ErrorState _error;
 
-        public StageAsyncResult(AsyncCallback callback, object extradata, Action completing) {
+        public StageAsyncResult(AsyncCallback callback, object extradata, Action completing)
+        {
             _managedThreadId = Thread.CurrentThread.ManagedThreadId;
             _callback = callback;
             AsyncState = extradata;
             _completing = completing;
         }
 
-        public WaitHandle AsyncWaitHandle {
+        public WaitHandle AsyncWaitHandle
+        {
             get { throw new NotImplementedException(); }
         }
 
@@ -31,36 +33,45 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
 
         public bool CompletedSynchronously { get; private set; }
 
-        public void InitialThreadReturning() {
+        public void InitialThreadReturning()
+        {
             _managedThreadId = Int32.MinValue;
         }
 
-        public void Fail(ErrorState error) {
+        public void Fail(ErrorState error)
+        {
             _error = error;
             TryComplete();
         }
 
-        public void TryComplete() {
-            if (Interlocked.Increment(ref _completions) != 1) {
+        public void TryComplete()
+        {
+            if (Interlocked.Increment(ref _completions) != 1)
+            {
                 return;
             }
 
-            if (_managedThreadId == Thread.CurrentThread.ManagedThreadId) {
+            if (_managedThreadId == Thread.CurrentThread.ManagedThreadId)
+            {
                 CompletedSynchronously = true;
             }
             IsCompleted = true;
             _completing.Invoke();
-            if (_callback != null) {
+            if (_callback != null)
+            {
                 _callback.Invoke(this);
             }
         }
 
-        public static void End(IAsyncResult ar) {
+        public static void End(IAsyncResult ar)
+        {
             var result = (StageAsyncResult)ar;
-            if (!result.IsCompleted) {
+            if (!result.IsCompleted)
+            {
                 throw new NotImplementedException();
             }
-            if (result._error != null) {
+            if (result._error != null)
+            {
                 result._error.Rethrow();
             }
         }

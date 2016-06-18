@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
+// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 namespace Microsoft.Owin.Logging
 {
@@ -7,7 +7,8 @@ namespace Microsoft.Owin.Logging
     /// </summary>
     public static class LoggerFactory
     {
-        static LoggerFactory() {
+        static LoggerFactory()
+        {
             Default = new DiagnosticsLoggerFactory();
         }
 

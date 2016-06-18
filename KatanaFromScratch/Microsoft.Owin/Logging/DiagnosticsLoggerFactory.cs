@@ -24,7 +24,8 @@ namespace Microsoft.Owin.Logging
         /// <summary>
         /// Creates a factory named "Microsoft.Owin".
         /// </summary>
-        public DiagnosticsLoggerFactory() {
+        public DiagnosticsLoggerFactory()
+        {
             _rootSourceSwitch = new SourceSwitch(RootTraceName);
             _rootTraceListener = null;
         }
@@ -34,7 +35,8 @@ namespace Microsoft.Owin.Logging
         /// </summary>
         /// <param name="rootSourceSwitch"></param>
         /// <param name="rootTraceListener"></param>
-        public DiagnosticsLoggerFactory(SourceSwitch rootSourceSwitch, TraceListener rootTraceListener) {
+        public DiagnosticsLoggerFactory(SourceSwitch rootSourceSwitch, TraceListener rootTraceListener)
+        {
             _rootSourceSwitch = rootSourceSwitch ?? new SourceSwitch(RootTraceName);
             _rootTraceListener = rootTraceListener;
         }
@@ -44,32 +46,41 @@ namespace Microsoft.Owin.Logging
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public ILogger Create(string name) {
+        public ILogger Create(string name)
+        {
             return new DiagnosticsLogger(GetOrAddTraceSource(name));
         }
 
-        private TraceSource GetOrAddTraceSource(string name) {
+        private TraceSource GetOrAddTraceSource(string name)
+        {
             return _sources.GetOrAdd(name, InitializeTraceSource);
         }
 
-        private TraceSource InitializeTraceSource(string traceSourceName) {
+        private TraceSource InitializeTraceSource(string traceSourceName)
+        {
             var traceSource = new TraceSource(traceSourceName);
-            if (traceSourceName == RootTraceName) {
-                if (HasDefaultSwitch(traceSource)) {
+            if (traceSourceName == RootTraceName)
+            {
+                if (HasDefaultSwitch(traceSource))
+                {
                     traceSource.Switch = _rootSourceSwitch;
                 }
-                if (_rootTraceListener != null) {
+                if (_rootTraceListener != null)
+                {
                     traceSource.Listeners.Add(_rootTraceListener);
                 }
             }
-            else {
+            else
+            {
                 string parentSourceName = ParentSourceName(traceSourceName);
-                if (HasDefaultListeners(traceSource)) {
+                if (HasDefaultListeners(traceSource))
+                {
                     TraceSource parentTraceSource = GetOrAddTraceSource(parentSourceName);
                     traceSource.Listeners.Clear();
                     traceSource.Listeners.AddRange(parentTraceSource.Listeners);
                 }
-                if (HasDefaultSwitch(traceSource)) {
+                if (HasDefaultSwitch(traceSource))
+                {
                     TraceSource parentTraceSource = GetOrAddTraceSource(parentSourceName);
                     traceSource.Switch = parentTraceSource.Switch;
                 }
@@ -78,16 +89,19 @@ namespace Microsoft.Owin.Logging
             return traceSource;
         }
 
-        private static string ParentSourceName(string traceSourceName) {
+        private static string ParentSourceName(string traceSourceName)
+        {
             int indexOfLastDot = traceSourceName.LastIndexOf('.');
             return indexOfLastDot == -1 ? RootTraceName : traceSourceName.Substring(0, indexOfLastDot);
         }
 
-        private static bool HasDefaultListeners(TraceSource traceSource) {
+        private static bool HasDefaultListeners(TraceSource traceSource)
+        {
             return traceSource.Listeners.Count == 1 && traceSource.Listeners[0] is DefaultTraceListener;
         }
 
-        private static bool HasDefaultSwitch(TraceSource traceSource) {
+        private static bool HasDefaultSwitch(TraceSource traceSource)
+        {
             return string.IsNullOrEmpty(traceSource.Switch.DisplayName) == string.IsNullOrEmpty(traceSource.Name) &&
                 traceSource.Switch.Level == SourceLevels.Off;
         }

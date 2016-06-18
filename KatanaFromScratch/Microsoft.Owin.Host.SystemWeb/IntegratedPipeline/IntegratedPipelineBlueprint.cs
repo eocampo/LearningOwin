@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
+// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
 {
@@ -11,21 +11,25 @@ namespace Microsoft.Owin.Host.SystemWeb.IntegratedPipeline
         public IntegratedPipelineBlueprint(
             OwinAppContext appContext,
             IntegratedPipelineBlueprintStage firstStage,
-            string pathBase) {
+            string pathBase)
+        {
             _appContext = appContext;
             _firstStage = firstStage;
             _pathBase = pathBase;
         }
 
-        public OwinAppContext AppContext {
+        public OwinAppContext AppContext
+        {
             get { return _appContext; }
         }
 
-        public IntegratedPipelineBlueprintStage FirstStage {
+        public IntegratedPipelineBlueprintStage FirstStage
+        {
             get { return _firstStage; }
         }
 
-        public string PathBase {
+        public string PathBase
+        {
             get { return _pathBase; }
         }
     }

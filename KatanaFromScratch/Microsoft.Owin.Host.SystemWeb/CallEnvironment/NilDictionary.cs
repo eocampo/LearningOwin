@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
+// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections;
@@ -14,67 +14,83 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         private static readonly object[] EmptyValues = new object[0];
         private static readonly IEnumerable<KeyValuePair<string, object>> EmptyKeyValuePairs = Enumerable.Empty<KeyValuePair<string, object>>();
 
-        public int Count {
+        public int Count
+        {
             get { return 0; }
         }
 
-        public bool IsReadOnly {
+        public bool IsReadOnly
+        {
             get { return false; }
         }
 
-        public ICollection<string> Keys {
+        public ICollection<string> Keys
+        {
             get { return EmptyKeys; }
         }
 
-        public ICollection<object> Values {
+        public ICollection<object> Values
+        {
             get { return EmptyValues; }
         }
 
         [SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations", Justification = "Not Implemented")]
-        public object this[string key] {
+        public object this[string key]
+        {
             get { throw new KeyNotFoundException(key); }
             set { throw new NotImplementedException(); }
         }
 
-        public IEnumerator<KeyValuePair<string, object>> GetEnumerator() {
+        public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+        {
             return EmptyKeyValuePairs.GetEnumerator();
         }
 
-        IEnumerator IEnumerable.GetEnumerator() {
+        IEnumerator IEnumerable.GetEnumerator()
+        {
             return EmptyKeyValuePairs.GetEnumerator();
         }
 
-        public void Add(KeyValuePair<string, object> item) {
+        public void Add(KeyValuePair<string, object> item)
+        {
             throw new NotImplementedException();
         }
 
-        public void Clear() {
+        public void Clear()
+        {
         }
 
-        public bool Contains(KeyValuePair<string, object> item) {
+        public bool Contains(KeyValuePair<string, object> item)
+        {
             return false;
         }
 
-        public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex) {
+        public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
+        {
         }
 
-        public bool Remove(KeyValuePair<string, object> item) {
+        public bool Remove(KeyValuePair<string, object> item)
+        {
             return false;
         }
 
-        public bool ContainsKey(string key) {
+        public bool ContainsKey(string key)
+        {
             return false;
         }
 
-        public void Add(string key, object value) {
+        public void Add(string key, object value)
+        {
             throw new NotImplementedException();
         }
 
-        public bool Remove(string key) {
+        public bool Remove(string key)
+        {
             return false;
         }
 
-        public bool TryGetValue(string key, out object value) {
+        public bool TryGetValue(string key, out object value)
+        {
             value = null;
             return false;
         }

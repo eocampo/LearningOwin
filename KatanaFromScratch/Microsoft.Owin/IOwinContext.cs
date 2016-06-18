@@ -1,11 +1,9 @@
-﻿﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
-
-// https://katanaproject.codeplex.com/SourceControl/latest#src/Microsoft.Owin/IOwinContext.cs
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-// using Microsoft.Owin.Security;
+using Microsoft.Owin.Security;
 
 namespace Microsoft.Owin
 {
@@ -26,11 +24,11 @@ namespace Microsoft.Owin
         /// <returns>A wrapper exposing response specific properties.</returns>
         IOwinResponse Response { get; }
 
-        ///// <summary>
-        ///// Gets the Authentication middleware functionality available on the current request.
-        ///// </summary>
-        ///// <returns>The authentication middleware functionality available on the current request.</returns>
-        //IAuthenticationManager Authentication { get; }
+        /// <summary>
+        /// Gets the Authentication middleware functionality available on the current request.
+        /// </summary>
+        /// <returns>The authentication middleware functionality available on the current request.</returns>
+        IAuthenticationManager Authentication { get; }
 
         /// <summary>
         /// Gets the OWIN environment.
@@ -38,11 +36,11 @@ namespace Microsoft.Owin
         /// <returns>The OWIN environment.</returns>
         IDictionary<string, object> Environment { get; }
 
-        ///// <summary>
-        ///// Gets or sets the host.TraceOutput environment value.
-        ///// </summary>
-        ///// <returns>The host.TraceOutput TextWriter.</returns>
-        //TextWriter TraceOutput { get; set; }
+        /// <summary>
+        /// Gets or sets the host.TraceOutput environment value.
+        /// </summary>
+        /// <returns>The host.TraceOutput TextWriter.</returns>
+        TextWriter TraceOutput { get; set; }
 
         /// <summary>
         /// Gets a value from the OWIN environment, or returns default(T) if not present.

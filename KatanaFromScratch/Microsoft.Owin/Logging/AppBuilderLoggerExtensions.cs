@@ -20,8 +20,10 @@ namespace Microsoft.Owin.Logging
         /// </summary>
         /// <param name="app"></param>
         /// <param name="loggerFactory"></param>
-        public static void SetLoggerFactory(this IAppBuilder app, ILoggerFactory loggerFactory) {
-            if (app == null) {
+        public static void SetLoggerFactory(this IAppBuilder app, ILoggerFactory loggerFactory)
+        {
+            if (app == null)
+            {
                 throw new ArgumentNullException("app");
             }
             app.Properties["server.LoggerFactory"] = new TraceFactoryDelegate(name => loggerFactory.Create(name).WriteCore);
@@ -32,14 +34,18 @@ namespace Microsoft.Owin.Logging
         /// </summary>
         /// <param name="app"></param>
         /// <returns></returns>
-        public static ILoggerFactory GetLoggerFactory(this IAppBuilder app) {
-            if (app == null) {
+        public static ILoggerFactory GetLoggerFactory(this IAppBuilder app)
+        {
+            if (app == null)
+            {
                 throw new ArgumentNullException("app");
             }
             object value;
-            if (app.Properties.TryGetValue("server.LoggerFactory", out value)) {
+            if (app.Properties.TryGetValue("server.LoggerFactory", out value))
+            {
                 var factory = value as TraceFactoryDelegate;
-                if (factory != null) {
+                if (factory != null)
+                {
                     return new WrapLoggerFactory(factory);
                 }
             }
@@ -52,8 +58,10 @@ namespace Microsoft.Owin.Logging
         /// <param name="app"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static ILogger CreateLogger(this IAppBuilder app, string name) {
-            if (app == null) {
+        public static ILogger CreateLogger(this IAppBuilder app, string name)
+        {
+            if (app == null)
+            {
                 throw new ArgumentNullException("app");
             }
             return (GetLoggerFactory(app) ?? LoggerFactory.Default).Create(name);
@@ -65,8 +73,10 @@ namespace Microsoft.Owin.Logging
         /// <param name="app"></param>
         /// <param name="component"></param>
         /// <returns></returns>
-        public static ILogger CreateLogger(this IAppBuilder app, Type component) {
-            if (component == null) {
+        public static ILogger CreateLogger(this IAppBuilder app, Type component)
+        {
+            if (component == null)
+            {
                 throw new ArgumentNullException("component");
             }
 
@@ -79,7 +89,8 @@ namespace Microsoft.Owin.Logging
         /// <typeparam name="TType"></typeparam>
         /// <param name="app"></param>
         /// <returns></returns>
-        public static ILogger CreateLogger<TType>(this IAppBuilder app) {
+        public static ILogger CreateLogger<TType>(this IAppBuilder app)
+        {
             return CreateLogger(app, typeof(TType));
         }
 
@@ -87,14 +98,17 @@ namespace Microsoft.Owin.Logging
         {
             private readonly TraceFactoryDelegate _create;
 
-            public WrapLoggerFactory(TraceFactoryDelegate create) {
-                if (create == null) {
+            public WrapLoggerFactory(TraceFactoryDelegate create)
+            {
+                if (create == null)
+                {
                     throw new ArgumentNullException("create");
                 }
                 _create = create;
             }
 
-            public ILogger Create(string name) {
+            public ILogger Create(string name)
+            {
                 return new WrappingLogger(_create.Invoke(name));
             }
         }
@@ -103,14 +117,17 @@ namespace Microsoft.Owin.Logging
         {
             private readonly Func<TraceEventType, int, object, Exception, Func<object, Exception, string>, bool> _write;
 
-            public WrappingLogger(Func<TraceEventType, int, object, Exception, Func<object, Exception, string>, bool> write) {
-                if (write == null) {
+            public WrappingLogger(Func<TraceEventType, int, object, Exception, Func<object, Exception, string>, bool> write)
+            {
+                if (write == null)
+                {
                     throw new ArgumentNullException("write");
                 }
                 _write = write;
             }
 
-            public bool WriteCore(TraceEventType eventType, int eventId, object state, Exception exception, Func<object, Exception, string> message) {
+            public bool WriteCore(TraceEventType eventType, int eventId, object state, Exception exception, Func<object, Exception, string> message)
+            {
                 return _write(eventType, eventId, state, exception, message);
             }
         }

@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-// https://katanaproject.codeplex.com/SourceControl/latest#src/Microsoft.Owin/IOwinResponse.cs
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -46,17 +44,17 @@ namespace Microsoft.Owin
         /// <returns>The owin.ResponseProtocol.</returns>
         string Protocol { get; set; }
 
-        ///// <summary>
-        ///// Gets the response header collection.
-        ///// </summary>
-        ///// <returns>The response header collection.</returns>
-        //IHeaderDictionary Headers { get; }
+        /// <summary>
+        /// Gets the response header collection.
+        /// </summary>
+        /// <returns>The response header collection.</returns>
+        IHeaderDictionary Headers { get; }
 
-        ///// <summary>
-        ///// Gets a collection used to manipulate the Set-Cookie header.
-        ///// </summary>
-        ///// <returns>A collection used to manipulate the Set-Cookie header.</returns>
-        //ResponseCookieCollection Cookies { get; }
+        /// <summary>
+        /// Gets a collection used to manipulate the Set-Cookie header.
+        /// </summary>
+        /// <returns>A collection used to manipulate the Set-Cookie header.</returns>
+        ResponseCookieCollection Cookies { get; }
 
         /// <summary>
         /// Gets or sets the Content-Length header.

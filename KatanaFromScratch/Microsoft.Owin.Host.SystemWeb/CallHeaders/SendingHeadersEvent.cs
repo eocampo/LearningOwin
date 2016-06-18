@@ -10,20 +10,25 @@ namespace Microsoft.Owin.Host.SystemWeb.CallHeaders
     {
         private IList<Tuple<Action<object>, object>> _callbacks = new List<Tuple<Action<object>, object>>();
 
-        internal void Register(Action<object> callback, object state) {
-            if (_callbacks == null) {
-                throw new InvalidOperationException("Cannot register for 'OnSendingHeaders' event after response headers have been sent.");
+        internal void Register(Action<object> callback, object state)
+        {
+            if (_callbacks == null)
+            {
+                throw new InvalidOperationException(Resources.Exception_CannotRegisterAfterHeadersSent);
             }
             _callbacks.Add(new Tuple<Action<object>, object>(callback, state));
         }
 
-        internal void Fire() {
+        internal void Fire()
+        {
             IList<Tuple<Action<object>, object>> callbacks = Interlocked.Exchange(ref _callbacks, null);
-            if (callbacks == null) {
+            if (callbacks == null)
+            {
                 return;
             }
             int count = callbacks.Count;
-            for (int index = 0; index != count; ++index) {
+            for (int index = 0; index != count; ++index)
+            {
                 Tuple<Action<object>, object> tuple = callbacks[count - index - 1];
                 tuple.Item1(tuple.Item2);
             }

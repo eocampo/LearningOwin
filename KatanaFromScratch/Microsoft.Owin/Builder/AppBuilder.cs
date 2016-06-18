@@ -8,7 +8,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
-//using Microsoft.Owin.Infrastructure;
+using Microsoft.Owin.Infrastructure;
 using Owin;
 
 namespace Microsoft.Owin.Builder
@@ -29,15 +29,16 @@ namespace Microsoft.Owin.Builder
         /// <summary>
         /// Initializes a new instance of the the type.
         /// </summary>
-        public AppBuilder() {
+        public AppBuilder()
+        {
             _properties = new Dictionary<string, object>();
             _conversions = new Dictionary<Tuple<Type, Type>, Delegate>();
             _middleware = new List<Tuple<Type, Delegate, object[]>>();
 
-            //_properties[Constants.BuilderAddConversion] = new Action<Delegate>(AddSignatureConversion);
+            _properties[Constants.BuilderAddConversion] = new Action<Delegate>(AddSignatureConversion);
             _properties[Constants.BuilderDefaultApp] = NotFound;
 
-            //SignatureConversions.AddConversions(this);
+            SignatureConversions.AddConversions(this);
         }
 
         /// <summary>
@@ -47,7 +48,8 @@ namespace Microsoft.Owin.Builder
         /// <param name="properties"></param>
         internal AppBuilder(
             IDictionary<Tuple<Type, Type>, Delegate> conversions,
-            IDictionary<string, object> properties) {
+            IDictionary<string, object> properties)
+        {
             _properties = properties;
             _conversions = conversions;
             _middleware = new List<Tuple<Type, Delegate, object[]>>();
@@ -58,7 +60,8 @@ namespace Microsoft.Owin.Builder
         /// components during the startup sequence. 
         /// </summary>
         /// <returns>Returns <see cref="T:System.Collections.Generic.IDictionary`2" />.</returns>
-        public IDictionary<string, object> Properties {
+        public IDictionary<string, object> Properties
+        {
             get { return _properties; }
         }
 
@@ -91,10 +94,11 @@ namespace Microsoft.Owin.Builder
         /// <returns>
         /// The IAppBuilder itself is returned. This enables you to chain your use statements together.
         /// </returns>
-        public IAppBuilder Use(object middleware, params object[] args) {
+        public IAppBuilder Use(object middleware, params object[] args)
+        {
             _middleware.Add(ToMiddlewareFactory(middleware, args));
             return this;
-        }        
+        }
 
         /// <summary>
         /// The New method creates a new instance of an IAppBuilder. This is needed to create
@@ -111,8 +115,8 @@ namespace Microsoft.Owin.Builder
         /// for you.
         /// </summary>
         /// <returns>The new instance of the IAppBuilder implementation</returns>
-        public IAppBuilder New() {
-            //throw new NotImplementedException();
+        public IAppBuilder New()
+        {
             return new AppBuilder(_conversions, _properties);
         }
 
@@ -130,35 +134,43 @@ namespace Microsoft.Owin.Builder
         /// Returns an instance of the pipeline's entry point. This object may be safely cast to the
         /// type which was provided
         /// </returns>
-        public object Build(Type returnType) {
+        public object Build(Type returnType)
+        {
             return BuildInternal(returnType);
         }
 
-        private void AddSignatureConversion(Delegate conversion) {
-            if (conversion == null) {
+        private void AddSignatureConversion(Delegate conversion)
+        {
+            if (conversion == null)
+            {
                 throw new ArgumentNullException("conversion");
             }
 
             Type parameterType = GetParameterType(conversion);
-            if (parameterType == null) {
-                throw new ArgumentException("Conversion delegate must take one parameter.", "conversion");
+            if (parameterType == null)
+            {
+                throw new ArgumentException(Resources.Exception_ConversionTakesOneParameter, "conversion");
             }
             Tuple<Type, Type> key = Tuple.Create(conversion.Method.ReturnType, parameterType);
             _conversions[key] = conversion;
         }
 
-        private static Type GetParameterType(Delegate function) {
+        private static Type GetParameterType(Delegate function)
+        {
             ParameterInfo[] parameters = function.Method.GetParameters();
             return parameters.Length >= 1 ? parameters[0].ParameterType : null;
         }
 
-        private object BuildInternal(Type signature) {
+        private object BuildInternal(Type signature)
+        {
             object app;
-            if (!_properties.TryGetValue(Constants.BuilderDefaultApp, out app)) {
+            if (!_properties.TryGetValue(Constants.BuilderDefaultApp, out app))
+            {
                 app = NotFound;
             }
 
-            foreach (var middleware in _middleware.Reverse()) {
+            foreach (var middleware in _middleware.Reverse())
+            {
                 Type neededSignature = middleware.Item1;
                 Delegate middlewareDelegate = middleware.Item2;
                 object[] middlewareArgs = middleware.Item3;
@@ -172,37 +184,46 @@ namespace Microsoft.Owin.Builder
             return Convert(signature, app);
         }
 
-        private object Convert(Type signature, object app) {
-            if (app == null) {
+        private object Convert(Type signature, object app)
+        {
+            if (app == null)
+            {
                 return null;
             }
 
             object oneHop = ConvertOneHop(signature, app);
-            if (oneHop != null) {
+            if (oneHop != null)
+            {
                 return oneHop;
             }
 
             object multiHop = ConvertMultiHop(signature, app);
-            if (multiHop != null) {
+            if (multiHop != null)
+            {
                 return multiHop;
             }
             throw new ArgumentException(
-                string.Format(CultureInfo.CurrentCulture, "No conversion available between {0} and {1}.", app.GetType(), signature),
+                string.Format(CultureInfo.CurrentCulture, Resources.Exception_NoConversionExists, app.GetType(), signature),
                 "signature");
         }
 
-        private object ConvertMultiHop(Type signature, object app) {
-            foreach (var conversion in _conversions) {
+        private object ConvertMultiHop(Type signature, object app)
+        {
+            foreach (var conversion in _conversions)
+            {
                 object preConversion = ConvertOneHop(conversion.Key.Item2, app);
-                if (preConversion == null) {
+                if (preConversion == null)
+                {
                     continue;
                 }
                 object intermediate = conversion.Value.DynamicInvoke(preConversion);
-                if (intermediate == null) {
+                if (intermediate == null)
+                {
                     continue;
                 }
                 object postConversion = ConvertOneHop(signature, intermediate);
-                if (postConversion == null) {
+                if (postConversion == null)
+                {
                     continue;
                 }
 
@@ -211,46 +232,58 @@ namespace Microsoft.Owin.Builder
             return null;
         }
 
-        private object ConvertOneHop(Type signature, object app) {
-            if (signature.IsInstanceOfType(app)) {
+        private object ConvertOneHop(Type signature, object app)
+        {
+            if (signature.IsInstanceOfType(app))
+            {
                 return app;
             }
-            if (typeof(Delegate).IsAssignableFrom(signature)) {
+            if (typeof(Delegate).IsAssignableFrom(signature))
+            {
                 Delegate memberDelegate = ToMemberDelegate(signature, app);
-                if (memberDelegate != null) {
+                if (memberDelegate != null)
+                {
                     return memberDelegate;
                 }
             }
-            foreach (var conversion in _conversions) {
+            foreach (var conversion in _conversions)
+            {
                 Type returnType = conversion.Key.Item1;
                 Type parameterType = conversion.Key.Item2;
                 if (parameterType.IsInstanceOfType(app) &&
-                    signature.IsAssignableFrom(returnType)) {
+                    signature.IsAssignableFrom(returnType))
+                {
                     return conversion.Value.DynamicInvoke(app);
                 }
             }
             return null;
         }
 
-        private static Delegate ToMemberDelegate(Type signature, object app) {
+        private static Delegate ToMemberDelegate(Type signature, object app)
+        {
             MethodInfo signatureMethod = signature.GetMethod(Constants.Invoke);
             ParameterInfo[] signatureParameters = signatureMethod.GetParameters();
 
             MethodInfo[] methods = app.GetType().GetMethods();
-            foreach (var method in methods) {
-                if (method.Name != Constants.Invoke) {
+            foreach (var method in methods)
+            {
+                if (method.Name != Constants.Invoke)
+                {
                     continue;
                 }
                 ParameterInfo[] methodParameters = method.GetParameters();
-                if (methodParameters.Length != signatureParameters.Length) {
+                if (methodParameters.Length != signatureParameters.Length)
+                {
                     continue;
                 }
                 if (methodParameters
                     .Zip(signatureParameters, (methodParameter, signatureParameter) => methodParameter.ParameterType.IsAssignableFrom(signatureParameter.ParameterType))
-                    .Any(compatible => compatible == false)) {
+                    .Any(compatible => compatible == false))
+                {
                     continue;
                 }
-                if (!signatureMethod.ReturnType.IsAssignableFrom(method.ReturnType)) {
+                if (!signatureMethod.ReturnType.IsAssignableFrom(method.ReturnType))
+                {
                     continue;
                 }
                 return Delegate.CreateDelegate(signature, app, method);
@@ -259,56 +292,68 @@ namespace Microsoft.Owin.Builder
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification = "False positive")]
-        private static Tuple<Type, Delegate, object[]> ToMiddlewareFactory(object middlewareObject, object[] args) {
-            if (middlewareObject == null) {
+        private static Tuple<Type, Delegate, object[]> ToMiddlewareFactory(object middlewareObject, object[] args)
+        {
+            if (middlewareObject == null)
+            {
                 throw new ArgumentNullException("middlewareObject");
             }
 
             var middlewareDelegate = middlewareObject as Delegate;
-            if (middlewareDelegate != null) {
+            if (middlewareDelegate != null)
+            {
                 return Tuple.Create(GetParameterType(middlewareDelegate), middlewareDelegate, args);
             }
 
             Tuple<Type, Delegate, object[]> factory = ToInstanceMiddlewareFactory(middlewareObject, args);
-            if (factory != null) {
+            if (factory != null)
+            {
                 return factory;
             }
 
             factory = ToGeneratorMiddlewareFactory(middlewareObject, args);
-            if (factory != null) {
+            if (factory != null)
+            {
                 return factory;
             }
 
-            if (middlewareObject is Type) {
+            if (middlewareObject is Type)
+            {
                 return ToConstructorMiddlewareFactory(middlewareObject, args, ref middlewareDelegate);
             }
 
             throw new NotSupportedException(string.Format(CultureInfo.CurrentCulture,
-                "The type '{0}' does not match any known middleware pattern.", middlewareObject.GetType().FullName));
+                Resources.Exception_MiddlewareNotSupported, middlewareObject.GetType().FullName));
         }
 
         // Instance pattern: public void Initialize(AppFunc next, string arg1, string arg2), public Task Invoke(IDictionary<...> env)
-        private static Tuple<Type, Delegate, object[]> ToInstanceMiddlewareFactory(object middlewareObject, object[] args) {
+        private static Tuple<Type, Delegate, object[]> ToInstanceMiddlewareFactory(object middlewareObject, object[] args)
+        {
             MethodInfo[] methods = middlewareObject.GetType().GetMethods();
-            foreach (var method in methods) {
-                if (method.Name != Constants.Initialize) {
+            foreach (var method in methods)
+            {
+                if (method.Name != Constants.Initialize)
+                {
                     continue;
                 }
                 ParameterInfo[] parameters = method.GetParameters();
                 Type[] parameterTypes = parameters.Select(p => p.ParameterType).ToArray();
 
-                if (parameterTypes.Length != args.Length + 1) {
+                if (parameterTypes.Length != args.Length + 1)
+                {
                     continue;
                 }
                 if (!parameterTypes
                     .Skip(1)
                     .Zip(args, TestArgForParameter)
-                    .All(x => x)) {
+                    .All(x => x))
+                {
                     continue;
                 }
 
                 // DynamicInvoke can't handle a middleware with multiple args, just push the args in via closure.
-                Func<object, object> func = app => {
+                Func<object, object> func = app =>
+                {
                     object[] invokeParameters = new[] { app }.Concat(args).ToArray();
                     method.Invoke(middlewareObject, invokeParameters);
                     return middlewareObject;
@@ -320,22 +365,27 @@ namespace Microsoft.Owin.Builder
         }
 
         // Delegate nesting pattern: public AppFunc Invoke(AppFunc app, string arg1, string arg2)
-        private static Tuple<Type, Delegate, object[]> ToGeneratorMiddlewareFactory(object middlewareObject, object[] args) {
+        private static Tuple<Type, Delegate, object[]> ToGeneratorMiddlewareFactory(object middlewareObject, object[] args)
+        {
             MethodInfo[] methods = middlewareObject.GetType().GetMethods();
-            foreach (var method in methods) {
-                if (method.Name != Constants.Invoke) {
+            foreach (var method in methods)
+            {
+                if (method.Name != Constants.Invoke)
+                {
                     continue;
                 }
                 ParameterInfo[] parameters = method.GetParameters();
                 Type[] parameterTypes = parameters.Select(p => p.ParameterType).ToArray();
 
-                if (parameterTypes.Length != args.Length + 1) {
+                if (parameterTypes.Length != args.Length + 1)
+                {
                     continue;
                 }
                 if (!parameterTypes
                     .Skip(1)
                     .Zip(args, TestArgForParameter)
-                    .All(x => x)) {
+                    .All(x => x))
+                {
                     continue;
                 }
                 IEnumerable<Type> genericFuncTypes = parameterTypes.Concat(new[] { method.ReturnType });
@@ -347,19 +397,23 @@ namespace Microsoft.Owin.Builder
         }
 
         // Type Constructor pattern: public Delta(AppFunc app, string arg1, string arg2)
-        private static Tuple<Type, Delegate, object[]> ToConstructorMiddlewareFactory(object middlewareObject, object[] args, ref Delegate middlewareDelegate) {
+        private static Tuple<Type, Delegate, object[]> ToConstructorMiddlewareFactory(object middlewareObject, object[] args, ref Delegate middlewareDelegate)
+        {
             var middlewareType = middlewareObject as Type;
             ConstructorInfo[] constructors = middlewareType.GetConstructors();
-            foreach (var constructor in constructors) {
+            foreach (var constructor in constructors)
+            {
                 ParameterInfo[] parameters = constructor.GetParameters();
                 Type[] parameterTypes = parameters.Select(p => p.ParameterType).ToArray();
-                if (parameterTypes.Length != args.Length + 1) {
+                if (parameterTypes.Length != args.Length + 1)
+                {
                     continue;
                 }
                 if (!parameterTypes
                     .Skip(1)
                     .Zip(args, TestArgForParameter)
-                    .All(x => x)) {
+                    .All(x => x))
+                {
                     continue;
                 }
 
@@ -370,10 +424,11 @@ namespace Microsoft.Owin.Builder
             }
 
             throw new MissingMethodException(string.Format(CultureInfo.CurrentCulture,
-                "The class '{0}' does not have a constructor taking {1} arguments.", middlewareType.FullName, args.Length + 1));
+                Resources.Exception_NoConstructorFound, middlewareType.FullName, args.Length + 1));
         }
 
-        private static bool TestArgForParameter(Type parameterType, object arg) {
+        private static bool TestArgForParameter(Type parameterType, object arg)
+        {
             return (arg == null && !parameterType.IsValueType) ||
                 parameterType.IsInstanceOfType(arg);
         }

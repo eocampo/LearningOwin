@@ -1,6 +1,4 @@
-﻿﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
-
-// https://katanaproject.codeplex.com/SourceControl/latest#src/Microsoft.Owin/Extensions/AppBuilderUseExtensions.cs
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Threading.Tasks;
@@ -21,9 +19,12 @@ namespace Owin
         /// <param name="app"></param>
         /// <param name="args">Any additional arguments for the middleware constructor</param>
         /// <returns></returns>
-        public static IAppBuilder Use<T>(this IAppBuilder app, params object[] args) {
+        public static IAppBuilder Use<T>(this IAppBuilder app, params object[] args)
+        {
             if (app == null)
-                throw new ArgumentNullException("app");            
+            {
+                throw new ArgumentNullException("app");
+            }
 
             return app.Use(typeof(T), args);
         }
@@ -33,12 +34,16 @@ namespace Owin
         /// </summary>
         /// <param name="app"></param>
         /// <param name="handler">An app that handles all requests</param>
-        public static void Run(this IAppBuilder app, Func<IOwinContext, Task> handler) {
-            if (app == null)            
+        public static void Run(this IAppBuilder app, Func<IOwinContext, Task> handler)
+        {
+            if (app == null)
+            {
                 throw new ArgumentNullException("app");
-            
-            if (handler == null)            
+            }
+            if (handler == null)
+            {
                 throw new ArgumentNullException("handler");
+            }
 
             app.Use<UseHandlerMiddleware>(handler);
         }
@@ -49,13 +54,17 @@ namespace Owin
         /// <param name="app"></param>
         /// <param name="handler">An app that handles the request or calls the given next Func</param>
         /// <returns></returns>
-        public static IAppBuilder Use(this IAppBuilder app, Func<IOwinContext, Func<Task> /*next*/, Task> handler) {
-            if (app == null) 
+        public static IAppBuilder Use(this IAppBuilder app, Func<IOwinContext, Func<Task> /*next*/, Task> handler)
+        {
+            if (app == null)
+            {
                 throw new ArgumentNullException("app");
-            
-            if (handler == null) 
+            }
+            if (handler == null)
+            {
                 throw new ArgumentNullException("handler");
-            
+            }
+
             return app.Use<UseHandlerMiddleware>(handler);
         }
     }

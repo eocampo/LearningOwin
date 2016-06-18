@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
+// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Diagnostics;
@@ -24,18 +24,22 @@ namespace Microsoft.Owin.Host.SystemWeb
 
         private ErrorState _errorState;
 
-        internal CallContextAsyncResult(IDisposable cleanup, AsyncCallback callback, object extraData) {
+        internal CallContextAsyncResult(IDisposable cleanup, AsyncCallback callback, object extraData)
+        {
             _cleanup = cleanup;
             _callback = callback ?? NoopAsyncCallback;
             AsyncState = extraData;
         }
 
-        public bool IsCompleted {
+        public bool IsCompleted
+        {
             get { return _isCompleted; }
         }
 
-        public WaitHandle AsyncWaitHandle {
-            get {
+        public WaitHandle AsyncWaitHandle
+        {
+            get
+            {
                 Contract.Assert(false, "Sync APIs and blocking are not supported by the OwinHttpModule");
                 // Can't throw, Asp.Net will choke. It will poll IsCompleted instead.
                 return null;
@@ -47,34 +51,42 @@ namespace Microsoft.Owin.Host.SystemWeb
         public bool CompletedSynchronously { get; private set; }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Users callback must not throw")]
-        public void Complete(bool completedSynchronously, ErrorState errorState) {
+        public void Complete(bool completedSynchronously, ErrorState errorState)
+        {
             _errorState = errorState;
 
             CompletedSynchronously = completedSynchronously;
 
             _isCompleted = true;
-            try {
+            try
+            {
                 Interlocked.Exchange(ref _callback, SecondAsyncCallback).Invoke(this);
             }
-            catch (Exception ex) {
-                Trace.WriteError("The IAsyncResult callback for OwinCallHandler threw an exception:", ex);
+            catch (Exception ex)
+            {
+                Trace.WriteError(Resources.Trace_OwinCallContextCallbackException, ex);
             }
         }
 
         [SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily", Justification = "False positive")]
-        public static void End(IAsyncResult result) {
+        public static void End(IAsyncResult result)
+        {
             var self = result as CallContextAsyncResult;
-            if (self == null) {
+            if (self == null)
+            {
                 // "EndProcessRequest must be called with return value of BeginProcessRequest"
                 throw new ArgumentException(string.Empty, "result");
             }
-            if (self._cleanup != null) {
+            if (self._cleanup != null)
+            {
                 self._cleanup.Dispose();
             }
-            if (self._errorState != null) {
+            if (self._errorState != null)
+            {
                 self._errorState.Rethrow();
             }
-            if (!self.IsCompleted) {
+            if (!self.IsCompleted)
+            {
                 // Calling EndProcessRequest before IsComplete is true is not allowed
                 throw new ArgumentException(string.Empty, "result");
             }

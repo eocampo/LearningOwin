@@ -1,7 +1,5 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-// https://katanaproject.codeplex.com/SourceControl/latest#src/Microsoft.Owin/IOwinRequest.cs
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -47,35 +45,35 @@ namespace Microsoft.Owin
         /// <returns>true if this request is using https; otherwise, false.</returns>
         bool IsSecure { get; }
 
-        ///// <summary>
-        ///// Gets or set the Host header. May include the port.
-        ///// </summary>
-        ///// <return>The Host header.</return>
-        //HostString Host { get; set; }
+        /// <summary>
+        /// Gets or set the Host header. May include the port.
+        /// </summary>
+        /// <return>The Host header.</return>
+        HostString Host { get; set; }
 
-        ///// <summary>
-        ///// Gets or set the owin.RequestPathBase.
-        ///// </summary>
-        ///// <returns>The owin.RequestPathBase.</returns>
-        //PathString PathBase { get; set; }
+        /// <summary>
+        /// Gets or set the owin.RequestPathBase.
+        /// </summary>
+        /// <returns>The owin.RequestPathBase.</returns>
+        PathString PathBase { get; set; }
 
-        ///// <summary>
-        ///// Gets or set the request path from owin.RequestPath.
-        ///// </summary>
-        ///// <returns>The request path from owin.RequestPath.</returns>
-        //PathString Path { get; set; }
+        /// <summary>
+        /// Gets or set the request path from owin.RequestPath.
+        /// </summary>
+        /// <returns>The request path from owin.RequestPath.</returns>
+        PathString Path { get; set; }
 
-        ///// <summary>
-        ///// Gets or set the query string from owin.RequestQueryString.
-        ///// </summary>
-        ///// <returns>The query string from owin.RequestQueryString.</returns>
-        //QueryString QueryString { get; set; }
+        /// <summary>
+        /// Gets or set the query string from owin.RequestQueryString.
+        /// </summary>
+        /// <returns>The query string from owin.RequestQueryString.</returns>
+        QueryString QueryString { get; set; }
 
-        ///// <summary>
-        ///// Gets the query value collection parsed from owin.RequestQueryString.
-        ///// </summary>
-        ///// <returns>The query value collection parsed from owin.RequestQueryString.</returns>
-        //IReadableStringCollection Query { get; }
+        /// <summary>
+        /// Gets the query value collection parsed from owin.RequestQueryString.
+        /// </summary>
+        /// <returns>The query value collection parsed from owin.RequestQueryString.</returns>
+        IReadableStringCollection Query { get; }
 
         /// <summary>
         /// Gets the uniform resource identifier (URI) associated with the request.
@@ -89,17 +87,17 @@ namespace Microsoft.Owin
         /// <returns>The owin.RequestProtocol.</returns>
         string Protocol { get; set; }
 
-        ///// <summary>
-        ///// Gets the request headers.
-        ///// </summary>
-        ///// <returns>The request headers.</returns>
-        //IHeaderDictionary Headers { get; }
+        /// <summary>
+        /// Gets the request headers.
+        /// </summary>
+        /// <returns>The request headers.</returns>
+        IHeaderDictionary Headers { get; }
 
-        ///// <summary>
-        ///// Gets the collection of Cookies for this request.
-        ///// </summary>
-        ///// <returns>The collection of Cookies for this request.</returns>
-        //RequestCookieCollection Cookies { get; }
+        /// <summary>
+        /// Gets the collection of Cookies for this request.
+        /// </summary>
+        /// <returns>The collection of Cookies for this request.</returns>
+        RequestCookieCollection Cookies { get; }
 
         /// <summary>
         /// Gets or sets the Content-Type header.
@@ -168,11 +166,11 @@ namespace Microsoft.Owin
         /// <returns>The server.User.</returns>
         IPrincipal User { get; set; }
 
-        ///// <summary>
-        ///// Asynchronously reads and parses the request body as a form.
-        ///// </summary>
-        ///// <returns>The parsed form data.</returns>
-        //Task<IFormCollection> ReadFormAsync();
+        /// <summary>
+        /// Asynchronously reads and parses the request body as a form.
+        /// </summary>
+        /// <returns>The parsed form data.</returns>
+        Task<IFormCollection> ReadFormAsync();
 
         /// <summary>
         /// Gets a value from the OWIN environment, or returns default(T) if not present.

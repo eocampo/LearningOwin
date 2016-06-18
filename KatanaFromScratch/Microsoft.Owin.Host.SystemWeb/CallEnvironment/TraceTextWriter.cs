@@ -15,10 +15,12 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         internal static TraceTextWriter Instance = new TraceTextWriter();
 
         public TraceTextWriter()
-            : base(CultureInfo.InvariantCulture) {
+            : base(CultureInfo.InvariantCulture)
+        {
         }
 
-        public override Encoding Encoding {
+        public override Encoding Encoding
+        {
             get { return Encoding.Default; }
         }
 
@@ -27,23 +29,29 @@ namespace Microsoft.Owin.Host.SystemWeb.CallEnvironment
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         private static extern void OutputDebugString(string message);
 
-        public override void Write(char value) {
+        public override void Write(char value)
+        {
             Write(value.ToString());
         }
 
-        public override void Write(char[] buffer, int index, int count) {
+        public override void Write(char[] buffer, int index, int count)
+        {
             Write(new string(buffer, index, count));
         }
 
-        public override void WriteLine(string value) {
+        public override void WriteLine(string value)
+        {
             Write(value + Environment.NewLine);
         }
 
-        public override void Write(string value) {
-            if (Debugger.IsLogging()) {
+        public override void Write(string value)
+        {
+            if (Debugger.IsLogging())
+            {
                 Debugger.Log(0, null, value);
             }
-            else {
+            else
+            {
                 OutputDebugString(value ?? string.Empty);
             }
         }

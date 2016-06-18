@@ -46,7 +46,20 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Microsoft.Owin.Host.SystemWeb\CallEnvironment\AspNetDictionary.cs" />
+    <Compile Include="Microsoft.Owin.Host.SystemWeb\CallEnvironment\AspNetDictionary.Generated.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AspNetDictionary.Generated.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Microsoft.Owin.Host.SystemWeb\DataProtection\MachineKeyDataProtectionProvider.cs" />
+    <Compile Include="Microsoft.Owin.Host.SystemWeb\DataProtection\MachineKeyDataProtector.cs" />
+    <Compile Include="Microsoft.Owin.Host.SystemWeb\DictionaryExtensions.cs" />
+    <Compile Include="Microsoft.Owin.Host.SystemWeb\HttpContextBaseExtensions.cs" />
+    <Compile Include="Microsoft.Owin.Host.SystemWeb\HttpContextExtensions.cs" />
+    <Compile Include="Microsoft.Owin.Host.SystemWeb\Infrastructure\ReferencedAssemblyWrapper.cs" />
     <Compile Include="Microsoft.Owin.Host.SystemWeb\OwinCallContext.Environment.cs" />
+    <Content Include="Owin.Loader\CopyResources.bat" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -60,8 +73,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Microsoft.Owin.Host.SystemWeb\CallContextAsyncResult.cs" />
-    <Compile Include="Microsoft.Owin.Host.SystemWeb\CallEnvironment\AspNetDictionary.cs" />
-    <Compile Include="Microsoft.Owin.Host.SystemWeb\CallEnvironment\AspNetDictionary.Generated.cs" />
     <Compile Include="Microsoft.Owin.Host.SystemWeb\CallEnvironment\NilDictionary.cs" />
     <Compile Include="Microsoft.Owin.Host.SystemWeb\CallEnvironment\TraceTextWriter.cs" />
     <Compile Include="Microsoft.Owin.Host.SystemWeb\CallHeaders\AspNetRequestHeaders.cs" />
@@ -91,43 +102,120 @@
     <Compile Include="Microsoft.Owin.Host.SystemWeb\OwinBuilder.cs" />
     <Compile Include="Microsoft.Owin.Host.SystemWeb\OwinCallContext.cs" />
     <Compile Include="Microsoft.Owin.Host.SystemWeb\OwinCallContext.DisableResponseCompression.cs" />
+    <Compile Include="Microsoft.Owin.Host.SystemWeb\OwinCallContext.WebSockets.cs" />
+    <Compile Include="Microsoft.Owin.Host.SystemWeb\OwinHttpHandler.cs" />
     <Compile Include="Microsoft.Owin.Host.SystemWeb\OwinHttpModule.cs" />
+    <Compile Include="Microsoft.Owin.Host.SystemWeb\OwinRoute.cs" />
+    <Compile Include="Microsoft.Owin.Host.SystemWeb\OwinRouteHandler.cs" />
     <Compile Include="Microsoft.Owin.Host.SystemWeb\PreApplicationStart.cs" />
+    <Compile Include="Microsoft.Owin.Host.SystemWeb\Resources.Designer.cs" />
+    <Compile Include="Microsoft.Owin.Host.SystemWeb\RouteCollectionExtensions.cs" />
     <Compile Include="Microsoft.Owin.Host.SystemWeb\ShutdownDetector.cs" />
     <Compile Include="Microsoft.Owin.Host.SystemWeb\UnsafeIISMethods.cs" />
     <Compile Include="Microsoft.Owin.Host.SystemWeb\Utils.cs" />
+    <Compile Include="Microsoft.Owin.Host.SystemWeb\WebSockets\OwinWebSocketWrapper.cs" />
+    <Compile Include="Microsoft.Owin.Host.SystemWeb\WebSockets\WebSocketConstants.cs" />
+    <Compile Include="Microsoft.Owin\BuilderProperties\Address.cs" />
+    <Compile Include="Microsoft.Owin\BuilderProperties\AddressCollection.cs" />
+    <Compile Include="Microsoft.Owin\BuilderProperties\AppProperties.cs" />
+    <Compile Include="Microsoft.Owin\BuilderProperties\Capabilities.cs" />
     <Compile Include="Microsoft.Owin\Builder\AppBuilder.cs" />
     <Compile Include="Microsoft.Owin\Builder\Constants.cs" />
     <Compile Include="Microsoft.Owin\Builder\NotFound.cs" />
+    <Compile Include="Microsoft.Owin\CookieOptions.cs" />
+    <Compile Include="Microsoft.Owin\Extensions\AppBuilderExtensions.cs" />
     <Compile Include="Microsoft.Owin\Extensions\AppBuilderUseExtensions.cs" />
+    <Compile Include="Microsoft.Owin\Extensions\IntegratedPipelineExtensions.cs" />
+    <Compile Include="Microsoft.Owin\Extensions\PipelineStage.cs" />
     <Compile Include="Microsoft.Owin\Extensions\UseHandlerMiddleware.cs" />
+    <Compile Include="Microsoft.Owin\FormCollection.cs" />
+    <Compile Include="Microsoft.Owin\GlobalSuppressions.cs" />
+    <Compile Include="Microsoft.Owin\HeaderDictionary.cs" />
+    <Compile Include="Microsoft.Owin\Helpers\WebHelpers.cs" />
     <Compile Include="Microsoft.Owin\HostString.cs" />
+    <Compile Include="Microsoft.Owin\IFormCollection.cs" />
+    <Compile Include="Microsoft.Owin\IHeaderDictionary.cs" />
+    <Compile Include="Microsoft.Owin\Infrastructure\AppFuncTransition.cs" />
+    <Compile Include="Microsoft.Owin\Infrastructure\ChunkingCookieManager.cs" />
     <Compile Include="Microsoft.Owin\Infrastructure\Constants.cs" />
+    <Compile Include="Microsoft.Owin\Infrastructure\ICookieManager.cs" />
+    <Compile Include="Microsoft.Owin\Infrastructure\ISystemClock.cs" />
+    <Compile Include="Microsoft.Owin\Infrastructure\OwinHelpers.cs" />
+    <Compile Include="Microsoft.Owin\Infrastructure\OwinMiddlewareTransition.cs" />
+    <Compile Include="Microsoft.Owin\Infrastructure\SignatureConversions.cs" />
+    <Compile Include="Microsoft.Owin\Infrastructure\SystemClock.cs" />
+    <Compile Include="Microsoft.Owin\Infrastructure\WebUtils.cs" />
     <Compile Include="Microsoft.Owin\IOwinContext.cs" />
     <Compile Include="Microsoft.Owin\IOwinRequest.cs" />
     <Compile Include="Microsoft.Owin\IOwinResponse.cs" />
+    <Compile Include="Microsoft.Owin\IReadableStringCollection.cs" />
+    <Compile Include="Microsoft.Owin\Loader\OwinStartupAttribute.cs" />
     <Compile Include="Microsoft.Owin\Logging\AppBuilderLoggerExtensions.cs" />
     <Compile Include="Microsoft.Owin\Logging\DiagnosticsLogger.cs" />
     <Compile Include="Microsoft.Owin\Logging\DiagnosticsLoggerFactory.cs" />
     <Compile Include="Microsoft.Owin\Logging\ILogger.cs" />
     <Compile Include="Microsoft.Owin\Logging\ILoggerFactory.cs" />
+    <Compile Include="Microsoft.Owin\Logging\LoggerExtensions.cs" />
     <Compile Include="Microsoft.Owin\Logging\LoggerFactory.cs" />
+    <Compile Include="Microsoft.Owin\Mapping\MapExtensions.cs" />
+    <Compile Include="Microsoft.Owin\Mapping\MapMiddleware.cs" />
+    <Compile Include="Microsoft.Owin\Mapping\MapOptions.cs" />
+    <Compile Include="Microsoft.Owin\Mapping\MapWhenExtensions.cs" />
+    <Compile Include="Microsoft.Owin\Mapping\MapWhenMiddleware.cs" />
+    <Compile Include="Microsoft.Owin\Mapping\MapWhenOptions.cs" />
     <Compile Include="Microsoft.Owin\OwinConstants.cs" />
     <Compile Include="Microsoft.Owin\OwinContext.cs" />
+    <Compile Include="Microsoft.Owin\OwinMiddleware.cs" />
     <Compile Include="Microsoft.Owin\OwinRequest.cs" />
     <Compile Include="Microsoft.Owin\OwinResponse.cs" />
     <Compile Include="Microsoft.Owin\PathString.cs" />
     <Compile Include="Microsoft.Owin\QueryString.cs" />
+    <Compile Include="Microsoft.Owin\ReadableStringCollection.cs" />
+    <Compile Include="Microsoft.Owin\RequestCookieCollection.cs" />
+    <Compile Include="Microsoft.Owin\Resources.Designer.cs" />
+    <Compile Include="Microsoft.Owin\ResponseCookieCollection.cs" />
+    <Compile Include="Microsoft.Owin\Security\AuthenticateResult.cs" />
+    <Compile Include="Microsoft.Owin\Security\AuthenticationDescription.cs" />
+    <Compile Include="Microsoft.Owin\Security\AuthenticationManager.cs" />
+    <Compile Include="Microsoft.Owin\Security\AuthenticationProperties.cs" />
+    <Compile Include="Microsoft.Owin\Security\AuthenticationResponseChallenge.cs" />
+    <Compile Include="Microsoft.Owin\Security\AuthenticationResponseGrant.cs" />
+    <Compile Include="Microsoft.Owin\Security\AuthenticationResponseRevoke.cs" />
+    <Compile Include="Microsoft.Owin\Security\IAuthenticationManager.cs" />
     <Compile Include="Owin.Loader\Constants.cs" />
     <Compile Include="Owin.Loader\DefaultLoader.cs" />
+    <Compile Include="Owin.Loader\LoaderResources.Designer.cs" />
     <Compile Include="Owin.Loader\NullLoader.cs" />
-    <Compile Include="Owin.Loader\SharedResourceNamespace\LoaderResources.cs" />
+    <Compile Include="Owin.Loader\Properties\AssemblyInfo.cs" />
     <Compile Include="Owin\IAppBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Microsoft.Owin.Hosting\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Microsoft.Owin\Resources.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Microsoft.Owin.Host.SystemWeb\CallEnvironment\AspNetDictionary.Generated.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>AspNetDictionary.Generated.cs</LastGenOutput>
+    </None>
+    <None Include="Microsoft.Owin.Host.SystemWeb.nuspec" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Owin.Loader\LoaderResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <CustomToolNamespace>SharedResourceNamespace</CustomToolNamespace>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Microsoft.Owin.Host.SystemWeb\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

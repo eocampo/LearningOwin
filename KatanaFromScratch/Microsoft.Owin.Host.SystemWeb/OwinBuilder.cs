@@ -12,41 +12,49 @@ namespace Microsoft.Owin.Host.SystemWeb
 {
     internal static class OwinBuilder
     {
-        internal static bool IsAutomaticAppStartupEnabled {
-            get {
+        internal static bool IsAutomaticAppStartupEnabled
+        {
+            get
+            {
                 string autoAppStartup = ConfigurationManager.AppSettings[Constants.OwinAutomaticAppStartup];
                 return string.IsNullOrWhiteSpace(autoAppStartup)
                     || string.Equals("true", autoAppStartup, StringComparison.OrdinalIgnoreCase);
             }
         }
 
-        internal static Action<IAppBuilder> GetAppStartup() {
+        internal static Action<IAppBuilder> GetAppStartup()
+        {
             string appStartup = ConfigurationManager.AppSettings[Constants.OwinAppStartup];
 
             var loader = new DefaultLoader(new ReferencedAssembliesWrapper());
             IList<string> errors = new List<string>();
             Action<IAppBuilder> startup = loader.Load(appStartup ?? string.Empty, errors);
 
-            if (startup == null) {
-                throw new EntryPointNotFoundException("The following errors occurred while attempting to load the app."
+            if (startup == null)
+            {
+                throw new EntryPointNotFoundException(Resources.Exception_AppLoderFailure
                     + Environment.NewLine + " - " + string.Join(Environment.NewLine + " - ", errors)
-                    + (IsAutomaticAppStartupEnabled ? Environment.NewLine + "To disable OWIN startup discovery, add the appSetting owin:AutomaticAppStartup with a value of \"false\" in your web.config." : string.Empty)
-                    + Environment.NewLine + "To specify the OWIN startup Assembly, Class, or Method, add the appSetting owin:AppStartup with the fully qualified startup class or configuration method name in your web.config.");
+                    + (IsAutomaticAppStartupEnabled ? Environment.NewLine + Resources.Exception_HowToDisableAutoAppStartup : string.Empty)
+                    + Environment.NewLine + Resources.Exception_HowToSpecifyAppStartup);
             }
             return startup;
         }
 
-        internal static OwinAppContext Build() {
+        internal static OwinAppContext Build()
+        {
             Action<IAppBuilder> startup = GetAppStartup();
             return Build(startup);
         }
 
-        internal static OwinAppContext Build(Func<IDictionary<string, object>, Task> app) {
+        internal static OwinAppContext Build(Func<IDictionary<string, object>, Task> app)
+        {
             return Build(builder => builder.Use(new Func<object, object>(_ => app)));
         }
 
-        internal static OwinAppContext Build(Action<IAppBuilder> startup) {
-            if (startup == null) {
+        internal static OwinAppContext Build(Action<IAppBuilder> startup)
+        {
+            if (startup == null)
+            {
                 throw new ArgumentNullException("startup");
             }
 
